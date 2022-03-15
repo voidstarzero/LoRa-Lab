@@ -130,9 +130,12 @@ void parse_packet(int expect_pkt_set)
     // Print the packet data
     print_packet(LoRa_data);
 
-    // Expect the next packet
-    // TODO: calculate based on pkt_id + 1 to account for dropped packets
-    expect_pkt++;
+    // Expect the next packet after the actual current one
+    int pkt_id_idx_start = pkt_set_idx_end + 1;
+    int pkt_id_idx_end = LoRa_data.indexOf(',', pkt_id_idx_start);
+    int actual_pkt = LoRa_data.substring(pkt_id_idx_start, pkt_id_idx_end).toInt();
+
+    expect_pkt = actual_pkt + 1;
 
     // And report a successful reception
     last_pkt_time = millis();
