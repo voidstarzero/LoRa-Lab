@@ -40,6 +40,9 @@ static int expect_pkt;
 // Last successful packet reception time
 static unsigned long last_pkt_time;
 
+// Consecutive number of packets with wrong params
+static int consec_wrong_pkts;
+
 void print_packet(String& LoRa_data)
 {
   // Print my GPS time
@@ -112,18 +115,14 @@ void parse_packet(int expect_pkt_set)
       return;
     }
 
-    // Extract Pkt_Set and reject packet if not expected
+    // Extract Pkt_Set and reject packet if not from expected set
     int pkt_set_idx_start = strlen(COMM_ID);
     int pkt_set_idx_end = LoRa_data.indexOf(',', pkt_set_idx_start);
     int actual_pkt_set = LoRa_data.substring(pkt_set_idx_start, pkt_set_idx_end).toInt();
 
     if (actual_pkt_set != expect_pkt_set)
     {
-      Serial.print("warn: Pkt_Set mismatch, expected ");
-      Serial.print(expect_pkt_set);
-      Serial.print(" but got ");
-      Serial.println(actual_pkt_set);
-
+      consec_wrong_pkts++;
       return;
     }
 
@@ -139,6 +138,9 @@ void parse_packet(int expect_pkt_set)
 
     // And report a successful reception
     last_pkt_time = millis();
+
+    // Breaks the chain of wrong packets
+    consec_wrong_pkts = 0;
   }
 }
 
@@ -152,9 +154,15 @@ void loop()
 
     expect_pkt = 0;
     last_pkt_time = millis(); // Reset wait time for each param batch
+    consec_wrong_pkts = 0;
     while (expect_pkt < PKTS_PER_PARAM)
     {
       parse_packet(i);
+
+      if (consec_wrong_pkts == 3) {
+        Serial.println("warn: Received 3 consecutive wrong packets, assuming wrong params...");
+        break;
+      }
 
       // If no packet detected within 7 seconds, assume the transmitter has moved on to an incompatible param set
       if (millis() - last_pkt_time > 7000) {
