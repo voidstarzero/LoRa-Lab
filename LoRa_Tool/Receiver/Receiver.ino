@@ -153,10 +153,10 @@ void loop()
     {
       parse_packet(i);
 
-      // If no packet detected within 10 seconds, assume the transmitter has moved on to an incompatible param set
-      if (millis() - last_pkt_time > 10000) {
+      // If no packet detected within 7 seconds, assume the transmitter has moved on to an incompatible param set
+      if (millis() - last_pkt_time > 7000) {
         // Try skipping straight to the next param set
-        Serial.println("warn: Not receiving packets for 10 seconds, skipping to next params...");
+        Serial.println("warn: Not receiving packets for 7 seconds, skipping to next params...");
         break;
       }
     }
