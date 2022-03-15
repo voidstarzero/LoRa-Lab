@@ -1,5 +1,7 @@
-//My library
-#include <my_library.h>
+//Libraries for LoRa
+#include <SPI.h>
+#include <LoRa.h>
+#include <Arduino.h>
 
 //Libraries used for GPS Module
 #include <TinyGPS++.h>
@@ -26,11 +28,80 @@ AXP20X_Class axp;
 //packet counter
 int counter = 0;
 
-//External strings pulled from my_library.h configuration file
-extern String logPrint;
-extern int NUM_PARAMETERS;
-extern int NUM_PACKETS;
-extern int dly;
+String logPrint; // variable to record logging data
+int NUM_PARAMETERS = 3; // number of unique parameters passed
+extern int NUM_PACKETS = 50; // number of packets to send
+extern int dly = 1000; // delay for transmission rate (ms)
+
+int cr_cur;
+
+int getCodingRate()
+{
+    return cr_cur;
+}
+
+/**
+ * Storing of parameters to cycle through
+ * NOTE
+ * From my testing, Spreading Factor must remain the same across the experiment and cannot be cycled.
+ * Please see https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md for values each parameter can take.
+ */
+
+// Storing parameters to test
+struct LoRa_Params
+{
+  //Supported values are 7.8E3, 10.4E3, 15.6E3, 20.8E3, 31.25E3, 41.7E3, 62.5E3, 125E3, 250E3, and 500E3.
+  long int bandwidth;
+
+  //Supported values are between 5 and 8, these correspond to coding rates of 4/5 and 4/8. The coding rate numerator is fixed at 4.
+  int codingRate;
+
+  //frequency - frequency in Hz (433E6, 868E6, 915E6)
+  long int frequency;
+
+  //Supported values are between 6 and 12. If a spreading factor of 6 is set, implicit header mode must be used to transmit and receive packets.
+  int spreadingFactor;
+
+  //Supported values are 2 to 20 for PA_OUTPUT_PA_BOOST_PIN, and 0 to 14 for PA_OUTPUT_RFO_PIN.
+  int txPower;
+};
+
+LoRa_Params params[] = {
+  {250E3, 5, 9233E5, 7, 10},
+  {250E3, 5, 9233E5, 7, 12},
+  {250E3, 5, 9233E5, 7, 14},
+};
+
+/**
+ * Function to set parameters, taking an integer to loop through
+ */
+String setParameters(int i)
+{
+  LoRa.setSignalBandwidth(params[i].bandwidth);
+  LoRa.setCodingRate4(params[i].codingRate);
+  LoRa.setFrequency(params[i].frequency);
+  LoRa.setSpreadingFactor(params[i].spreadingFactor);
+  LoRa.setTxPower(params[i].txPower);
+
+  long int bw = params[i].bandwidth;
+  int cr = params[i].codingRate;
+  long int freq = params[i].frequency;
+  int sf = params[i].spreadingFactor;
+  int tx = params[i].txPower;
+
+  cr_cur = params[i].codingRate;
+
+  // Storing in csv to print to log file
+  logPrint = "";
+  logPrint = logPrint +
+             bw + "," +
+             cr + "," +
+             freq + "," +
+             sf + "," +
+             tx;
+
+  return logPrint;
+}
 
 void setup()
 {
@@ -81,11 +152,15 @@ void sendPacket()
   String lng = String(t_lng,6);
   
   Serial.println(lat + "," + lng);
+  // Added by James
+  LoRa.print("JAMES,");
   LoRa.print(counter);
   LoRa.print(",");
   LoRa.print(lat);
   LoRa.print(",");
   LoRa.print(lng);
+  LoRa.print(",");
+  LoRa.print(getCodingRate());
 
   LoRa.endPacket();
   counter++;
@@ -107,9 +182,7 @@ void loop()
       sendPacket();
     }
   }
-  Serial.println("Lora End!");
-  LoRa.end();
-  return;
+  Serial.println("Run end!");
 }
 
 static void smartDelay(unsigned long ms)
