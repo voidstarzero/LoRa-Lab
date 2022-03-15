@@ -40,6 +40,58 @@ static int expect_pkt;
 // Last successful packet reception time
 static unsigned long last_pkt_time;
 
+void print_packet(String& LoRa_data)
+{
+  // Print my GPS time
+  if (gps.time.hour() < 10) Serial.print("0");
+  Serial.print(gps.time.hour());
+
+  Serial.print(":");
+  if (gps.time.minute() < 10) Serial.print("0");
+  Serial.print(gps.time.minute());
+
+  Serial.print(":");
+  if (gps.time.second() < 10) Serial.print("0");
+  Serial.print(gps.time.second());
+
+  // Print packet contents
+  Serial.print(",");
+  Serial.print(LoRa_data);
+
+  // Print LoRa parameters
+  Serial.print(",");
+  Serial.print(cur_params.bandwidth);
+
+  Serial.print(",");
+  Serial.print(cur_params.codingRate);
+
+  Serial.print(",");
+  Serial.print(cur_params.frequency);
+
+  Serial.print(",");
+  Serial.print(cur_params.spreadingFactor);
+
+  Serial.print(",");
+  Serial.print(cur_params.txPower);
+
+  // Print LoRa metrics
+  Serial.print(",");
+  Serial.print(LoRa.packetRssi());
+
+  Serial.print(",");
+  Serial.print(LoRa.rssi());
+
+  Serial.print(",");
+  Serial.print(LoRa.packetSnr());
+
+  // Print my GPS location
+  Serial.print(",");
+  Serial.print(String(gps.location.lat(), 6));
+
+  Serial.print(",");
+  Serial.println(String(gps.location.lng(), 6));
+}
+
 void parse_packet(int expect_pkt_set)
 {
   int packet_sz = LoRa.parsePacket();
@@ -60,57 +112,23 @@ void parse_packet(int expect_pkt_set)
       return;
     }
 
-    // TODO: reject packet if Pkt_Set mismatches current set
-    (void) expect_pkt_set;
+    // Extract Pkt_Set and reject packet if not expected
+    int pkt_set_idx_start = strlen(COMM_ID);
+    int pkt_set_idx_end = LoRa_data.indexOf(',', pkt_set_idx_start);
+    int actual_pkt_set = LoRa_data.substring(pkt_set_idx_start, pkt_set_idx_end).toInt();
 
-    // Print my GPS time
-    if (gps.time.hour() < 10) Serial.print("0");
-    Serial.print(gps.time.hour());
+    if (actual_pkt_set != expect_pkt_set)
+    {
+      Serial.print("warn: Pkt_Set mismatch, expected ");
+      Serial.print(expect_pkt_set);
+      Serial.print(" but got ");
+      Serial.println(actual_pkt_set);
 
-    Serial.print(":");
-    if (gps.time.minute() < 10) Serial.print("0");
-    Serial.print(gps.time.minute());
+      return;
+    }
 
-    Serial.print(":");
-    if (gps.time.second() < 10) Serial.print("0");
-    Serial.print(gps.time.second());
-
-    // Print packet contents
-    Serial.print(",");
-    Serial.print(LoRa_data);
-
-    // Print LoRa parameters
-    Serial.print(",");
-    Serial.print(cur_params.bandwidth);
-
-    Serial.print(",");
-    Serial.print(cur_params.codingRate);
-
-    Serial.print(",");
-    Serial.print(cur_params.frequency);
-
-    Serial.print(",");
-    Serial.print(cur_params.spreadingFactor);
-
-    Serial.print(",");
-    Serial.print(cur_params.txPower);
-    
-    // Print LoRa metrics
-    Serial.print(",");
-    Serial.print(LoRa.packetRssi());
-
-    Serial.print(",");
-    Serial.print(LoRa.rssi());
-
-    Serial.print(",");
-    Serial.print(LoRa.packetSnr());
-
-    // Print my GPS location
-    Serial.print(",");
-    Serial.print(String(gps.location.lat(), 6));
-
-    Serial.print(",");
-    Serial.println(String(gps.location.lng(), 6));
+    // Print the packet data
+    print_packet(LoRa_data);
 
     // Expect the next packet
     // TODO: calculate based on pkt_id + 1 to account for dropped packets
