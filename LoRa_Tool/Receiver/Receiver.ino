@@ -34,9 +34,13 @@ static void smart_delay(unsigned long ms)
   } while (millis() - start < ms);
 }
 
+// Next packet ID to expect to receive
 static int expect_pkt;
 
-void parse_packet()
+// Last successful packet reception time
+static unsigned long last_pkt_time;
+
+void parse_packet(int expect_pkt_set)
 {
   int packet_sz = LoRa.parsePacket();
   if (packet_sz)
@@ -51,6 +55,9 @@ void parse_packet()
     }
 
     // TODO: abort if packet does not start with COMM_ID + ','
+
+    // TODO: reject packet if Pkt_Set mismatches current set
+    (void) expect_pkt_set;
 
     // Print my GPS time
     if (gps.time.hour() < 10) Serial.print("0");
@@ -104,6 +111,9 @@ void parse_packet()
     // Expect the next packet
     // TODO: calculate based on pkt_id + 1 to account for dropped packets
     expect_pkt++;
+
+    // And report a successful reception
+    last_pkt_time = millis();
   }
 }
 
@@ -116,11 +126,17 @@ void loop()
     delay(DELAY);
 
     expect_pkt = 0;
+    last_pkt_time = millis(); // Reset wait time for each param batch
     while (expect_pkt < PKTS_PER_PARAM)
     {
-      parse_packet();
+      parse_packet(i);
 
-      // TODO: If no packet detected within 5-10 seconds, automatically advance to next params (assume missed transition)
+      // If no packet detected within 10 seconds, assume the transmitter has moved on to an incompatible param set
+      if (millis() - last_pkt_time > 10000) {
+        // Try skipping straight to the next param set
+        Serial.println("warn: Not receiving packets for 10 seconds, skipping to next params...");
+        break;
+      }
     }
   }
 }
