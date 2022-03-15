@@ -3,7 +3,7 @@
 #define BAND 915E6
 
 // Prefix for all transmitted messages, for disambiguation
-#define COMM_ID "JAMES"
+#define COMM_ID "JAMES," // Must end with a comma
 
 // Delay for transmission rate (ms)
 #define DELAY 1000
@@ -21,4 +21,3 @@ const LoRa_Params params[] = {
 
 // Number of test packets sent with each set of parameters
 #define PKTS_PER_PARAM 50
-

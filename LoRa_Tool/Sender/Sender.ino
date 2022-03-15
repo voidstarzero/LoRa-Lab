@@ -36,11 +36,10 @@ void send_packet(int i, int j)
   String msg;
   smart_delay(DELAY / 2);
 
-  // Add the comm ID
+  // Add the comm ID (includes trailing comma itself)
   msg += COMM_ID;
 
   // Add the param number and packet number
-  msg += ',';
   msg += i;
   msg += ',';
   msg += j;

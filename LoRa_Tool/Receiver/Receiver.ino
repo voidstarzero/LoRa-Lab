@@ -54,7 +54,11 @@ void parse_packet(int expect_pkt_set)
       LoRa_data += LoRa.readString();
     }
 
-    // TODO: abort if packet does not start with COMM_ID + ','
+    // Reject packet if not starting with COMM_ID
+    if (!LoRa_data.startsWith(COMM_ID))
+    {
+      return;
+    }
 
     // TODO: reject packet if Pkt_Set mismatches current set
     (void) expect_pkt_set;
