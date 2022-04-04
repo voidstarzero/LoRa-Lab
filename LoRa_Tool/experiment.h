@@ -3,7 +3,7 @@
 #define BAND 915E6
 
 // Prefix for all transmitted messages, for disambiguation
-#define COMM_ID "JAMES," // Must end with a comma
+#define COMM_ID "JAJP," // Must end with a comma
 
 // Delay for transmission rate (ms)
 #define DELAY 1000
@@ -11,9 +11,15 @@
 // Define each parameter set
 const LoRa_Params params[] = {
   //  Bandwidth,  coding rate,  frequency,  spreading factor, transmit power
-  {   250E3,      5,            9233E5,     7,                10},
-  {   250E3,      5,            9233E5,     7,                12},
-  {   250E3,      5,            9233E5,     7,                14},
+  {   250E3,      5,            9233E5,     6,                12},
+  {   500E3,      5,            9233E5,     6,                4},
+  {   500E3,      5,            9233E5,     6,                9},
+  {   500E3,      5,            9233E5,     6,                14},
+  {   250E3,      5,            9233E5,     7,                13},
+  {   250E3,      5,            9233E5,     7,                18},
+  {   250E3,      5,            9233E5,     8,                20},
+  {   250E3,      5,            9233E5,     10,               20},
+  {   250E3,      5,            9233E5,     12,               20},
 };
 
 // Number of different test parameter sets
