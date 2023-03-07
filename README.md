@@ -81,7 +81,7 @@ C:\Users\<YOUR_USERNAME>\Documents\Arduino\libraries
 ```
 cd C:\Users\<YOUR_USERNAME>\Documents\Arduino
 
-git clone git@github.com:jordz3/LoRa-Lab.git
+git clone https://github.com/voidstarzero/LoRa-Lab
 ```
 2. Copy the `Lab_Utils` folder to the Arduino `libraries` folder.
 ```
