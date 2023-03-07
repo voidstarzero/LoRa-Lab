@@ -98,6 +98,8 @@ C:\Users\<YOUR_USERNAME>\Documents\Arduino\libraries\LoRa_Tool
 
 3. Edit the paramaters in the file to suit your experiment needs.
 
+3.1. **Windows Users:** On Windows, the symbolic links may break from `LoRa_Tool/Sender/experiment.h` and `LoRa_Tool/Receiver/experiment.h` to `LoRa_Tool/experiment.h`. You can just copy the `experiment.h` file from `LoRa_Tool/experiment.h` into the `LoRa_Tool/Sender` and the `LoRa_Tool/Receiver` directories to compile the sender and receiver.
+
 4. Save the file.
 
 5. Navigate to the LoRa_Tool folder
