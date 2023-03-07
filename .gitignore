@@ -3,3 +3,4 @@ workspace.code-workspace
 code.code-workspace
 api-key.txt
 test.txt
+.DS_Store

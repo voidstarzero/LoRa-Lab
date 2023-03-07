@@ -13,7 +13,7 @@ The software for this lab was developed as part of a UWA Master's of Professiona
 
 The software is a LoRa toolkit for creating and recreating experiments with simple configuration.
 
-To setup an experimental LoRa parameter configuration to test, edit the `my_library.cpp` file as needed. 
+To setup an experimental LoRa parameter configuration to test, edit the `Lora_Tool/experiment.h` file as needed. 
 
 
 
@@ -46,17 +46,7 @@ Navigate to: https://jupyter.org/try and select `Try JupyterLab`
 1. Follow the "Installing ESP32 Add-on in Arduino IDE" steps.
 
 https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/
-<!--
-2. Installing the LoRa Library via Arduino IDE Library Manager
 
-   i. Choose `Sketch` -> `Include Library` -> `Manage Libraries...`
-
-   ii. Type `LoRa` into the search box.
-
-   iii. Click the row to select the library.
-
-   iv. Click the `Install` button to install the library.
--->
 
 2. Clone the following libraries to the Arduino `libraries` folder.
 ```
@@ -91,22 +81,24 @@ C:\Users\<YOUR_USERNAME>\Documents\Arduino\libraries
 ```
 cd C:\Users\<YOUR_USERNAME>\Documents\Arduino
 
-git clone git@github.com:jordz3/LoRa-Lab.git
+git clone https://github.com/voidstarzero/LoRa-Lab
 ```
-2. Copy the my_library folder to the Arduino `libraries` folder.
+2. Copy the `Lab_Utils` folder to the Arduino `libraries` folder.
 ```
 C:\Users\<YOUR_USERNAME>\Documents\Arduino\libraries
 ```
 
 ## Uploading Code to TTGO T Beams
 
-1. Open the location of `My_Library`.
+1. Open the location of `LoRa_Tool`.
 ```
-C:\Users\<YOUR_USERNAME>\Documents\Arduino\libraries\My_Library
+C:\Users\<YOUR_USERNAME>\Documents\Arduino\libraries\LoRa_Tool
 ``` 
-2. Open the `my_library.cpp` file in your editor of choice.
+2. Open the `experiment.h` file in your editor of choice.
 
 3. Edit the paramaters in the file to suit your experiment needs.
+
+3.1. **Windows Users:** On Windows, the symbolic links may break from `LoRa_Tool/Sender/experiment.h` and `LoRa_Tool/Receiver/experiment.h` to `LoRa_Tool/experiment.h`. You can just copy the `experiment.h` file from `LoRa_Tool/experiment.h` into the `LoRa_Tool/Sender` and the `LoRa_Tool/Receiver` directories to compile the sender and receiver.
 
 4. Save the file.
 
